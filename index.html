@@ -1,0 +1,489 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>모둠 IQ 대작전</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@600;800&display=swap">
+<style>
+/* Layout: 실험실 측정지(모눈 바탕) 위에 문제 카드 하나 + 하단 모둠 점수 레일 */
+:root{
+  --paper:#EEF1EA; --grid:rgba(20,33,61,.07); --card:#FFFFFF; --ink:#14213D; --muted:#5A6478;
+  --line:#CDD3C6; --accent:#FF5A1F; --accent-ink:#FFFFFF; --signal:#1F7A5C; --signal-bg:#DDF1E8;
+  --warn-bg:#FFE7DC; --chip:#E3E8DD;
+  --display:"Black Han Sans","Pretendard","Apple SD Gothic Neo",sans-serif;
+  --body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#10151F; --grid:rgba(200,215,240,.06); --card:#1A2130; --ink:#E9EDF3; --muted:#9AA6BA;
+  --line:#2D3648; --accent:#FF7440; --accent-ink:#1A0E08; --signal:#4FD1A1; --signal-bg:#173A30;
+  --warn-bg:#3A2219; --chip:#252E40; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#10151F; --grid:rgba(200,215,240,.06); --card:#1A2130; --ink:#E9EDF3; --muted:#9AA6BA;
+  --line:#2D3648; --accent:#FF7440; --accent-ink:#1A0E08; --signal:#4FD1A1; --signal-bg:#173A30;
+  --warn-bg:#3A2219; --chip:#252E40; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:28px 28px}
+.wrap{max-width:1180px;margin:0 auto;padding-block:20px 140px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.brand{font-family:var(--display);font-size:clamp(22px,3vw,30px);letter-spacing:.01em;display:flex;align-items:baseline;gap:10px}
+.brand small{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.08em}
+.ghost{background:transparent;border:1.5px solid var(--line);border-radius:999px;padding:6px 14px;font-size:14px;color:var(--muted)}
+.ghost:hover{border-color:var(--ink);color:var(--ink)}
+.btn{background:var(--ink);color:var(--paper);border:0;border-radius:12px;padding:12px 22px;font-weight:700;font-size:16px}
+.btn.hot{background:var(--accent);color:var(--accent-ink)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+h1,h2,h3{text-wrap:balance;margin:0}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+
+/* setup */
+.hero{display:grid;grid-template-columns:1.2fr 1fr;gap:28px;align-items:start}
+.hero h1{font-family:var(--display);font-weight:400;font-size:clamp(44px,7vw,92px);line-height:1;margin:10px 0 14px}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.lead{color:var(--muted);max-width:52ch;font-size:17px}
+.panel{background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:22px}
+.panel h3{font-size:17px;margin-bottom:12px}
+.stepper{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.stepper button{width:40px;height:40px;border-radius:10px;border:1.5px solid var(--line);background:var(--paper);font-size:20px}
+.stepper b{font-family:var(--mono);font-size:26px;min-width:36px;text-align:center}
+.names{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.names input{width:100%;padding:9px 11px;border-radius:10px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);font:inherit}
+.timeline{margin-top:26px}
+.tl{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:10px}
+.tl div{background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:10px 8px;min-width:0}
+.tl b{display:block;font-family:var(--mono);font-size:13px;color:var(--accent)}
+.tl span{font-size:13px;line-height:1.35;display:block}
+.rules{margin:14px 0 0;padding-left:18px;color:var(--muted);font-size:15px}
+.rules li{margin:3px 0}
+
+/* hub */
+.rounds{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.rcard{text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:8px;min-height:190px;position:relative}
+.rcard:hover{border-color:var(--ink);transform:translateY(-2px)}
+.rcard .no{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.rcard h3{font-family:var(--display);font-weight:400;font-size:26px;line-height:1.15}
+.rcard p{margin:0;color:var(--muted);font-size:14px}
+.rcard .meta{margin-top:auto;display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-family:var(--mono);font-size:12px;background:var(--chip);border-radius:6px;padding:3px 7px}
+.rcard.done{opacity:.6}
+.rcard.done::after{content:"완료";position:absolute;top:14px;right:14px;font-weight:700;font-size:13px;color:var(--signal);background:var(--signal-bg);padding:2px 9px;border-radius:999px}
+.hubfoot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:20px;flex-wrap:wrap}
+
+/* question */
+.qhead{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.qhead .rn{font-family:var(--display);font-size:22px}
+.dots{display:flex;gap:6px}
+.dots i{width:22px;height:6px;border-radius:3px;background:var(--line)}
+.dots i.on{background:var(--accent)}
+.dots i.past{background:var(--ink)}
+.qcard{background:var(--card);border:1.5px solid var(--line);border-radius:22px;padding:clamp(20px,4vw,40px);display:grid;grid-template-columns:1fr auto;gap:24px}
+.qtext{font-size:clamp(22px,3.1vw,36px);font-weight:700;line-height:1.35;min-width:0}
+.qtext .seq{font-family:var(--mono);letter-spacing:.06em;color:var(--accent);white-space:nowrap}
+.timer{width:118px;height:118px;position:relative;flex:none}
+.timer svg{width:100%;height:100%;transform:rotate(-90deg)}
+.timer .num{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--mono);font-weight:800;font-size:34px}
+.timer button{position:absolute;left:50%;bottom:-38px;transform:translateX(-50%);white-space:nowrap}
+.opts{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+.opt{display:flex;gap:14px;align-items:center;background:var(--paper);border:2px solid var(--line);border-radius:14px;padding:14px 16px;font-size:clamp(17px,2vw,22px);font-weight:500;min-width:0}
+.opt .k{font-family:var(--mono);font-weight:800;width:34px;height:34px;flex:none;border-radius:8px;display:grid;place-items:center;background:var(--ink);color:var(--paper);font-size:16px}
+.opt.right{border-color:var(--signal);background:var(--signal-bg)}
+.opt.right .k{background:var(--signal)}
+.opt.fade{opacity:.35}
+.answerbox{grid-column:1/-1;border-radius:14px;padding:16px 18px;background:var(--signal-bg);border:2px solid var(--signal)}
+.answerbox b{font-size:clamp(20px,2.6vw,28px);display:block}
+.answerbox p{margin:6px 0 0;font-size:16px}
+.hidden-ans{grid-column:1/-1;border:2px dashed var(--line);border-radius:14px;padding:16px;color:var(--muted);text-align:center}
+.mark{margin-top:18px;background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:16px 18px}
+.mark h3{font-size:16px;margin-bottom:10px}
+.mark .hint{color:var(--muted);font-weight:400;font-size:14px}
+.tchips{display:flex;flex-wrap:wrap;gap:8px}
+.tchip{display:flex;align-items:stretch;border:2px solid var(--line);border-radius:12px;overflow:hidden;background:var(--paper)}
+.tchip button{border:0;background:transparent;padding:9px 14px;font-weight:700}
+.tchip .x2{border-left:2px solid var(--line);font-family:var(--mono);font-size:13px;padding:9px 10px;color:var(--muted)}
+.tchip.ok{border-color:var(--signal);background:var(--signal-bg)}
+.tchip .x2.on{background:var(--accent);color:var(--accent-ink)}
+.tchip .x2:disabled{opacity:.3;cursor:not-allowed}
+.qnav{display:flex;justify-content:space-between;gap:10px;margin-top:16px;flex-wrap:wrap}
+
+/* summary / final */
+.big{font-family:var(--display);font-weight:400;font-size:clamp(40px,6vw,72px);line-height:1.05}
+.board{display:grid;gap:10px;margin-top:20px}
+.row{display:grid;grid-template-columns:56px 1fr auto;gap:14px;align-items:center;background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:14px 18px}
+.row .rk{font-family:var(--mono);font-weight:800;font-size:26px}
+.row .nm{font-weight:700;font-size:20px;min-width:0}
+.row .nm small{display:block;font-weight:500;color:var(--muted);font-size:14px}
+.row .iq{text-align:right;font-family:var(--mono);font-weight:800;font-size:30px;font-variant-numeric:tabular-nums}
+.row .iq small{display:block;font-size:12px;color:var(--muted);font-weight:600}
+.row.first{border-color:var(--accent);box-shadow:0 0 0 3px var(--warn-bg)}
+.bar{height:8px;border-radius:4px;background:var(--chip);margin-top:6px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent)}
+.reflect{margin-top:22px}
+.reflect ol{margin:8px 0 0;padding-left:22px;font-size:17px}
+.fine{color:var(--muted);font-size:13px;margin-top:14px}
+
+/* score rail */
+.rail{position:fixed;left:0;right:0;bottom:0;background:var(--ink);color:var(--paper);z-index:5;
+  padding-block:10px calc(10px + env(safe-area-inset-bottom,0px));
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.rail .in{max-width:1180px;margin:0 auto;display:flex;gap:8px;overflow-x:auto;align-items:center}
+.rail .lab{font-family:var(--mono);font-size:11px;letter-spacing:.14em;opacity:.6;flex:none;margin-right:4px}
+.sc{flex:none;display:flex;align-items:baseline;gap:8px;padding:6px 12px;border-radius:10px;background:rgba(255,255,255,.08)}
+.sc b{font-weight:700;font-size:15px}
+.sc span{font-family:var(--mono);font-weight:800;font-size:20px;font-variant-numeric:tabular-nums}
+.sc em{font-style:normal;font-family:var(--mono);font-size:11px;opacity:.6}
+.sc.bump span{color:var(--accent)}
+.swatch{width:10px;height:10px;border-radius:3px;flex:none;align-self:center}
+
+@media (max-width:760px){
+  .hero{grid-template-columns:1fr}
+  .tl{grid-template-columns:repeat(2,1fr)}
+  .qcard{grid-template-columns:1fr}
+  .timer{margin:0 auto 34px}
+  .opts{grid-template-columns:1fr}
+  .names{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+.rcard,.opt,.tchip{transition:transform .15s,border-color .15s,background .15s,opacity .2s}
+@keyframes pop{0%{transform:scale(.96);opacity:0}100%{transform:none;opacity:1}}
+.qcard{animation:pop .25s ease-out}
+.setpanel{display:grid;gap:18px}
+.setpanel h3{margin-bottom:8px}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.seg button{border:1.5px solid var(--line);background:var(--paper);border-radius:10px;padding:8px 10px;font-weight:700;font-size:15px;text-align:left;min-width:0}
+.seg button small{display:block;font-weight:400;font-size:12px;color:var(--muted);line-height:1.3}
+.seg button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.seg button.on small{color:var(--paper);opacity:.75}
+.est{margin:8px 0 0;font-size:13px;color:var(--signal);font-weight:600}
+.est.over{color:var(--accent)}
+.lvtxt{color:var(--accent);font-weight:700}
+.lvmix{display:flex;gap:10px;flex-wrap:wrap;font-family:var(--mono);font-size:12px;color:var(--accent)}
+.lvbadge{display:flex;align-items:center;gap:8px;border:2px solid var(--line);border-radius:999px;padding:5px 14px;font-weight:700;font-size:15px;background:var(--card)}
+.lvbadge .stars{color:var(--accent);letter-spacing:.05em}
+.lvbadge.lv3{border-color:var(--accent);background:var(--warn-bg)}
+@media (max-width:760px){.seg{grid-template-columns:1fr 1fr}}
+</style>
+
+<div class="wrap" id="app"></div>
+<div class="rail" id="rail" hidden><div class="in" id="railIn"></div></div>
+
+<script>
+(()=>{
+const TEAM_COLORS=["#FF5A1F","#2F6BFF","#1F9E6E","#B83DD6","#E0A100","#E0336B","#0FA3B1","#7A5C3A"];
+/* d: 난이도 1=★ 2=★★ 3=★★★ */
+const ROUNDS=[
+ {id:"brain",name:"두뇌 워밍업",sub:"수열·논리·추리로 뇌를 깨우는 라운드",qs:[
+  {d:1,q:'규칙을 찾아 ?에 들어갈 수는?<br><span class="seq">1, 4, 9, 16, 25, ?</span>',o:["30","35","36","49"],a:2,e:"1², 2², 3², 4², 5² … 다음은 6² = 36"},
+  {d:1,q:'규칙을 찾아 ?에 들어갈 수는?<br><span class="seq">1, 1, 2, 3, 5, 8, 13, ?</span>',o:["18","20","21","26"],a:2,e:"앞의 두 수를 더하는 피보나치 수열. 8 + 13 = 21"},
+  {d:1,q:"어떤 수에 3을 곱하고 6을 더했더니 30이 되었다. 어떤 수는?",o:["6","8","9","12"],a:1,e:"3x + 6 = 30 → x = 8"},
+  {d:1,q:"보통 주사위에서 서로 마주 보는 두 면의 눈을 더하면 항상 얼마일까?",o:["6","7","8","9"],a:1,e:"1↔6, 2↔5, 3↔4. 마주 보는 면의 합은 항상 7입니다."},
+  {d:2,q:'규칙을 찾아 ?에 들어갈 수는?<br><span class="seq">2, 3, 5, 9, 17, ?</span>',o:["31","33","34","35"],a:1,e:"앞의 수 × 2 − 1 규칙입니다. 17 × 2 − 1 = 33"},
+  {d:2,q:"시계가 3시 30분을 가리킬 때 시침과 분침 사이의 작은 각도는?",o:["60°","75°","90°","105°"],a:1,e:"분침은 180°, 시침은 3시(90°)에서 30분 동안 15° 더 움직여 105°. 180 − 105 = 75°"},
+  {d:2,q:"아버지는 아들보다 30살 많다. 10년 뒤 아버지 나이는 아들 나이의 2배가 된다. 아들의 지금 나이는?",o:["15살","20살","25살","30살"],a:1,e:"아들 x → x + 40 = 2(x + 10) → x = 20"},
+  {d:2,q:"“모든 A반 학생은 수학Ⅱ를 듣는다. 민수는 수학Ⅱ를 듣는다.” 이때 ‘민수는 A반이다’는?",o:["반드시 참","반드시 거짓","알 수 없다","절반만 참"],a:2,e:"수학Ⅱ를 듣는 학생이 A반에만 있다는 정보는 없습니다. 판단할 수 없어요."},
+  {d:3,q:'다음 글자 배열의 ?에 들어갈 알파벳은?<br><span class="seq">O, T, T, F, F, S, S, E, ?</span>',o:["N","T","E","O"],a:0,e:"One, Two, Three, Four … Eight 다음은 Nine의 N"},
+  {d:3,q:'규칙을 찾아 ?에 들어갈 수는?<br><span class="seq">1, 2, 6, 24, 120, ?</span>',o:["240","600","720","840"],a:2,e:"×2, ×3, ×4, ×5 … 다음은 120 × 6 = 720 (6!)"},
+  {d:3,q:"깊이 10m 우물 바닥의 달팽이가 낮에 3m 올라가고 밤에 2m 미끄러진다. 우물 밖으로 나오는 날은?",o:["7일째","8일째","9일째","10일째"],a:1,e:"7일째 밤까지 7m. 8일째 낮에 3m 올라 10m에 닿으니 미끄러지기 전에 탈출!"},
+  {d:3,q:"3명이 3분 동안 빵 3개를 만든다. 9명이 빵 9개를 만드는 데 걸리는 시간은?",o:["1분","3분","6분","9분"],a:1,e:"한 사람이 3분에 빵 1개. 9명이 동시에 만들면 3분이면 9개입니다."}
+ ]},
+ {id:"career",name:"진로 IQ",sub:"직업·역량·진로검사 상식",qs:[
+  {d:1,q:"방대한 데이터를 분석해 기업이나 기관의 의사결정에 필요한 통찰을 찾아내는 직업은?",o:["데이터 사이언티스트","네트워크 관리자","웹 퍼블리셔","정보보안 관제요원"],a:0,e:"통계·프로그래밍·도메인 지식을 함께 쓰는 대표 융합 직업입니다. 관련 학과: 통계학, 컴퓨터공학, 산업공학, 데이터사이언스학과 등"},
+  {d:1,q:"‘T자형 인재’에서 T의 세로 막대(|)가 뜻하는 것은?",o:["폭넓은 교양","한 분야의 깊은 전문성","팀워크","리더십"],a:1,e:"가로(—)는 여러 분야를 아우르는 폭, 세로(|)는 한 분야를 깊이 파는 전문성입니다."},
+  {d:1,q:"AI가 일상화될수록 오히려 가치가 커질 것으로 꼽히는 역량과 거리가 먼 것은?",o:["문제를 새로 정의하는 힘","공감과 협업","단순 반복 계산 속도","윤리적 판단"],a:2,e:"반복 계산은 AI와 기계가 가장 먼저 대신하는 영역입니다."},
+  {d:1,q:"간호사·약사·물리치료사로 일하려면 공통으로 꼭 통과해야 하는 것은?",o:["국가시험(면허)","토익 900점","대학원 졸업","공무원 시험"],a:0,e:"보건의료 직업은 관련 학과를 졸업하고 국가시험에 합격해 면허를 받아야 일할 수 있습니다."},
+  {d:2,q:"홀랜드(Holland) 직업흥미유형 6가지에 들어가지 않는 것은?",o:["탐구형(I)","관습형(C)","감성형(F)","진취형(E)"],a:2,e:"6유형은 현실형(R)·탐구형(I)·예술형(A)·사회형(S)·진취형(E)·관습형(C), 줄여서 RIASEC입니다."},
+  {d:2,q:"발명가를 대신해 특허 출원과 등록, 특허 분쟁 업무를 맡는 전문 직업은?",o:["감정평가사","변리사","관세사","노무사"],a:1,e:"변리사는 이공계 지식과 법 지식을 함께 쓰는 직업이라 이공계 출신이 많습니다."},
+  {d:2,q:"진로정보망 ‘커리어넷’을 운영하는 기관은?",o:["한국고용정보원","한국직업능력연구원","한국교육과정평가원","한국대학교육협의회"],a:1,e:"커리어넷은 한국직업능력연구원이 운영합니다. 고용24(옛 워크넷)는 한국고용정보원 소관이에요."},
+  {d:2,q:"공항 관제탑에서 항공기의 이착륙 순서와 비행 경로를 지시하는 직업은?",o:["운항관리사","항공교통관제사","항공정비사","공항 보안검색요원"],a:1,e:"항공교통관제사는 영어 교신 능력과 순간 판단력이 중요한 직업입니다."},
+  {d:3,q:"홀랜드 육각형 모형에서 ‘탐구형(I)’과 정반대 꼭짓점에 있는 유형은?",o:["예술형(A)","사회형(S)","진취형(E)","관습형(C)"],a:2,e:"육각형 순서는 R-I-A-S-E-C. 마주 보는 쌍은 R↔S, I↔E, A↔C입니다."},
+  {d:3,q:"교통사고·화재 같은 보험 사고가 났을 때 손해액을 조사해 보험금을 산정하는 직업은?",o:["보험계리사","손해사정사","감정평가사","세무사"],a:1,e:"손해사정사가 사고 손해를 평가합니다. 보험계리사는 보험 상품의 보험료와 위험률을 계산해요."},
+  {d:3,q:"‘디지털 트윈’ 기술에 대한 설명으로 알맞은 것은?",o:["두 대의 컴퓨터를 하나로 묶는 기술","현실의 사물·공간을 가상 공간에 똑같이 구현해 시뮬레이션하는 기술","쌍둥이 연구용 유전자 분석 기술","같은 앱을 두 기기에 설치하는 기술"],a:1,e:"공장·도시·인체 등을 가상으로 복제해 미리 실험해 보는 기술로, 스마트시티·제조업에서 쓰입니다."},
+  {d:3,q:"‘긱 이코노미(gig economy)’에 대한 설명으로 알맞은 것은?",o:["평생 한 회사에 다니는 고용 형태","필요할 때마다 단기 계약으로 일하는 경제 형태","정부가 일자리를 직접 만드는 정책","게임 산업 중심의 경제"],a:1,e:"배달 플랫폼, 프리랜서 플랫폼처럼 일감 단위로 일하는 방식이 늘고 있습니다."}
+ ]},
+ {id:"curri",name:"교육과정 IQ",sub:"2022 개정 교육과정 · 고교학점제",qs:[
+  {d:1,q:"고교학점제에서 고등학교 졸업에 필요한 최소 이수 학점은?",o:["174학점","180학점","192학점","204학점"],a:2,e:"교과 174학점 + 창의적 체험활동 18학점 = 192학점"},
+  {d:1,q:"고교학점제에서 1학점의 수업량은?",o:["50분 × 10회","50분 × 16회","50분 × 17회","50분 × 20회"],a:1,e:"1학점 = 50분 수업 16회 기준입니다."},
+  {d:1,q:"2022 개정 교육과정의 선택 과목 유형이 아닌 것은?",o:["일반 선택","진로 선택","융합 선택","심화 선택"],a:3,e:"선택 과목은 일반·진로·융합 선택 세 가지입니다. ‘심화 선택’은 예전 교육과정의 용어예요."},
+  {d:1,q:"고1부터 적용되는 내신 5등급제에서 1등급은 상위 몇 %까지일까?",o:["4%","10%","11%","20%"],a:1,e:"1등급 10%, 2등급 누적 34%, 3등급 66%, 4등급 90%, 5등급 100%"},
+  {d:2,q:"고교학점제에서 한 과목을 ‘이수’하려면 출석률과 함께 무엇을 충족해야 할까?",o:["학업성취율 40% 이상","학업성취율 60% 이상","석차등급 4등급 이내","수행평가 만점"],a:0,e:"과목 출석률 3분의 2 이상 + 학업성취율 40% 이상이 이수 기준입니다."},
+  {d:2,q:"2022 개정 교육과정 창의적 체험활동의 영역이 아닌 것은?",o:["자율·자치활동","동아리활동","진로활동","봉사활동"],a:3,e:"창체는 자율·자치, 동아리, 진로 3개 영역입니다. 봉사활동은 별도 영역이 아니라 다른 영역 안에서 이루어져요."},
+  {d:2,q:"졸업 학점 192학점 가운데 창의적 체험활동은 몇 학점일까?",o:["12학점","16학점","18학점","24학점"],a:2,e:"교과 174학점 + 창체 18학점입니다."},
+  {d:2,q:"다음 중 고1 공통 과목이 아닌 것은?",o:["공통국어1","통합과학1","한국사1","대수"],a:3,e:"‘대수’는 수학 일반 선택 과목입니다. 고1 수학 공통 과목은 공통수학1·2예요."},
+  {d:3,q:"내신 5등급제에서 3등급은 누적 상위 몇 %까지일까?",o:["50%","60%","66%","75%"],a:2,e:"1등급 10% → 2등급 34% → 3등급 66% → 4등급 90% → 5등급 100% (누적)"},
+  {d:3,q:"학업성취율 40%에 미치지 못할 것으로 예상되는 학생에게 학교가 제공하는 것은?",o:["최소 성취수준 보장지도","즉시 유급","다음 학년 자동 재수강","전학 권고"],a:0,e:"예방지도와 보충지도를 통해 최소 성취수준에 도달하도록 돕습니다. 미이수가 나오면 보충 이수를 해요."},
+  {d:3,q:"2022 개정 교육과정에서 수학 ‘진로 선택’ 과목은?",o:["대수","확률과 통계","미적분Ⅱ","공통수학2"],a:2,e:"수학 진로 선택: 기하, 미적분Ⅱ, 경제 수학, 인공지능 수학, 직무 수학 등. 대수·미적분Ⅰ·확률과 통계는 일반 선택입니다."},
+  {d:3,q:"2022 개정 교육과정에서 과학 ‘융합 선택’ 과목은?",o:["물리학","역학과 에너지","기후변화와 환경생태","화학"],a:2,e:"과학 융합 선택: 과학의 역사와 문화, 기후변화와 환경생태, 융합과학 탐구. 물리학·화학은 일반 선택, 역학과 에너지는 진로 선택이에요."}
+ ]},
+ {id:"admission",name:"대입 IQ",sub:"수시·정시·수능·학생부",qs:[
+  {d:1,q:"수시모집에서 일반대학에 지원할 수 있는 최대 횟수는? (과학기술원·사관학교 등 제외)",o:["3회","5회","6회","제한 없음"],a:2,e:"수시는 최대 6회 지원할 수 있습니다."},
+  {d:1,q:"정시모집은 몇 개의 ‘군’으로 나누어 각 군에서 1개씩 지원할까?",o:["2개 군","3개 군 (가·나·다)","4개 군","6개 군"],a:1,e:"가·나·다 군에서 1개씩, 최대 3번 지원합니다."},
+  {d:1,q:"수능 영어 영역에서 1등급을 받으려면 원점수 몇 점 이상이어야 할까?",o:["80점","85점","90점","95점"],a:2,e:"영어는 절대평가라 90점 이상이면 누구나 1등급입니다."},
+  {d:1,q:"수능 성적을 중심으로 신입생을 뽑는 모집 시기는?",o:["수시모집","정시모집","편입학","재외국민 특별전형"],a:1,e:"정시는 주로 수능 점수로, 수시는 주로 학생부(교과·종합)로 선발합니다."},
+  {d:2,q:"2028학년도 수능부터 탐구 영역에서 수험생이 공통으로 응시하는 과목은?",o:["물리학·화학","생활과 윤리·사회문화","통합사회·통합과학","한국사·세계사"],a:2,e:"2028 수능은 선택과목 없이 통합사회와 통합과학을 공통으로 봅니다."},
+  {d:2,q:"현재 학생부 항목 중 대입 자료로 반영되는 것은?",o:["수상경력","독서활동상황","교과 세부능력 및 특기사항","자율동아리"],a:2,e:"수상경력·독서활동·자율동아리·개인봉사는 대입에 반영되지 않습니다. 세특은 학생부종합전형의 핵심 자료예요."},
+  {d:2,q:"학생부종합전형 공통 평가요소(학업·진로·공동체)에 해당하지 않는 것은?",o:["학업역량","진로역량","공동체역량","수상역량"],a:3,e:"주요 대학 공동연구에서 제시한 3대 평가요소는 학업역량·진로역량·공동체역량입니다."},
+  {d:2,q:"‘수능 최저학력기준’에 대한 설명으로 알맞은 것은?",o:["수능 응시 자격 조건","수시 합격을 위해 수능에서 넘어야 하는 최소 등급 조건","정시에서만 쓰는 감점 기준","내신 최저 등급 기준"],a:1,e:"예: ‘국·수·영·탐 중 2개 합 5등급 이내’. 서류·면접을 통과해도 최저를 못 맞추면 불합격입니다."},
+  {d:3,q:"2028학년도 수능에서 상대평가(9등급)로 남는 영역은?",o:["영어","한국사","제2외국어/한문","국어"],a:3,e:"국어·수학·탐구는 상대평가, 영어·한국사·제2외국어/한문은 절대평가입니다."},
+  {d:3,q:"2028학년도 수능 수학 영역의 출제 범위가 아닌 것은?",o:["대수","미적분Ⅰ","확률과 통계","기하"],a:3,e:"2028 수능 수학은 대수, 미적분Ⅰ, 확률과 통계를 공통으로 봅니다."},
+  {d:3,q:"수시모집에 합격한 학생이 정시모집에 지원할 수 있을까?",o:["등록만 안 하면 지원 가능","합격하면 등록 여부와 관계없이 지원 불가","제한 없이 지원 가능","1개 대학만 지원 가능"],a:1,e:"수시 합격자는 등록하지 않아도 정시·추가모집에 지원할 수 없습니다. 수시 원서는 신중하게!"},
+  {d:3,q:"2028학년도 수능 국어 영역의 시험 형태는?",o:["화법과 작문·언어와 매체 중 선택","선택과목 없이 공통 응시","문학만 출제","독서만 출제"],a:1,e:"2028 수능부터 국어·수학 모두 선택과목이 없어지고 공통으로 응시합니다."}
+ ]},
+ {id:"speed",name:"스피드 넌센스",sub:"제한시간 30초! 보드에 쓰고 외쳐라",speed:true,qs:[
+  {d:1,q:"세상에서 가장 빠른 닭은?",t:"후다닥",e:"‘후다닥’ 달아나니까요."},
+  {d:1,q:"자동차를 톡 하고 치면?",t:"카톡",e:"Car + 톡"},
+  {d:1,q:"개가 사람을 가르치면?",t:"개인지도",e:"개인(人) 지도 → 개인지도"},
+  {d:1,q:"아몬드가 죽으면?",t:"다이아몬드",e:"die + 아몬드"},
+  {d:2,q:"수험생이 시험 전에 가장 많이 선물받는 떡은? (힌트: 딱 ○○라!)",t:"찹쌀떡 (엿)",e:"찰싹 ‘붙으라’는 뜻. 엿도 정답으로 인정!"},
+  {d:2,q:"왕이 넘어지면?",t:"킹콩",e:"King + 콩 넘어지는 소리"},
+  {d:2,q:"바나나가 웃으면?",t:"바나나킥",e:"바나나 + 킥킥"},
+  {d:2,q:"진짜 새의 이름은?",t:"참새",e:"‘참’ = 진짜"},
+  {d:3,q:"오리가 얼면?",t:"언덕",e:"언 + duck(오리)"},
+  {d:3,q:"물고기의 반대말은?",t:"불고기",e:"물 ↔ 불"},
+  {d:3,q:"세상에서 가장 지루한 중학교는?",t:"로딩중",e:"하염없이 기다리는 ‘로딩 중’"},
+  {d:3,q:"아홉 명의 자식을 세 글자로 하면?",t:"아이구",e:"아이 + 9(구)"}
+ ]}
+];
+const LV={1:{pts:10,time:30,star:"★☆☆",name:"기초"},2:{pts:15,time:45,star:"★★☆",name:"표준"},3:{pts:20,time:60,star:"★★★",name:"도전"}};
+const ptsOf=q=>LV[q.d].pts;
+const timeOf=(r,q)=>r.speed?30:LV[q.d].time;
+const MODES=[
+ {id:"basic",name:"기초",sub:"★ 위주, 처음 하는 학년",lv:[1,2],w:[3,1]},
+ {id:"standard",name:"표준",sub:"★~★★★ 고르게",lv:[1,2,3],w:[1,1,1]},
+ {id:"challenge",name:"도전",sub:"★★·★★★ 위주",lv:[2,3],w:[1,1]},
+ {id:"hard",name:"끝판왕",sub:"★★★만",lv:[3],w:[1]}
+];
+const COUNTS=[4,6,8,12];
+
+function buildSet(){
+  const m=MODES.find(x=>x.id===S.mode)||MODES[1];
+  S.set=ROUNDS.map(r=>{
+    const pools=m.lv.map(l=>shuffle(r.qs.map((q,i)=>i).filter(i=>r.qs[i].d===l)));
+    const pick=[];let guard=0;
+    while(pick.length<S.per&&pools.some(p=>p.length)&&guard++<99){
+      m.lv.forEach((_,k)=>{for(let w=0;w<m.w[k];w++){if(pick.length<S.per&&pools[k].length)pick.push(pools[k].shift())}});
+    }
+    if(pick.length<S.per){shuffle(r.qs.map((q,i)=>i).filter(i=>!pick.includes(i))).slice(0,S.per-pick.length).forEach(i=>pick.push(i))}
+    return pick.sort((a,b)=>r.qs[a].d-r.qs[b].d);
+  });
+  S.max=S.set.reduce((s,ids,ri)=>s+ids.reduce((t,i)=>t+ptsOf(ROUNDS[ri].qs[i]),0),0);
+}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function estMin(per){return Math.round(5*per*1.25+13)}
+
+const blank=()=>({screen:"setup",count:6,names:["1모둠","2모둠","3모둠","4모둠","5모둠","6모둠","7모둠","8모둠"],
+  mode:"standard",per:6,set:null,max:0,scores:[],x2used:[],done:[],round:0,qi:0,revealed:false,marks:{},x2:{}});
+let S=blank();
+try{const v=localStorage.getItem("iq-state-v2");if(v)S=Object.assign(blank(),JSON.parse(v))}catch(e){}
+if(S.screen!=="setup"&&!S.set){S.screen="setup"}
+const save=()=>{try{localStorage.setItem("iq-state-v2",JSON.stringify(S))}catch(e){}};
+const app=document.getElementById("app");
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const teams=()=>S.names.slice(0,S.count);
+const curQ=()=>ROUNDS[S.round].qs[S.set[S.round][S.qi]];
+
+let tick=null,left=0,bumped=new Set();
+function stopTimer(){clearInterval(tick);tick=null}
+let actx=null;
+function beep(f,d){try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();const o=actx.createOscillator(),g=actx.createGain();o.frequency.value=f;o.connect(g);g.connect(actx.destination);g.gain.setValueAtTime(.18,actx.currentTime);g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);o.start();o.stop(actx.currentTime+d)}catch(e){}}
+
+function rail(){
+  const r=document.getElementById("rail");
+  if(S.screen==="setup"){r.hidden=true;return}
+  r.hidden=false;
+  document.getElementById("railIn").innerHTML='<span class="lab">SCORE</span>'+teams().map((n,i)=>
+    `<div class="sc${bumped.has(i)?" bump":""}"><i class="swatch" style="background:${TEAM_COLORS[i]}"></i><b>${esc(n)}</b><span>${S.scores[i]||0}</span>${S.x2used[i]?"":"<em>×2</em>"}</div>`).join("");
+}
+function topBar(extra=""){
+  return `<div class="top"><div class="brand">모둠 IQ 대작전 <small>SUNGDO · CAREER LAB</small></div><div style="display:flex;gap:8px;flex-wrap:wrap">${extra}</div></div>`;
+}
+
+function render(){
+  stopTimer();
+  ({setup:vSetup,hub:vHub,q:vQ,sum:vSum,final:vFinal})[S.screen]();
+  rail();save();
+}
+
+function vSetup(){
+  const bank=ROUNDS.reduce((s,r)=>s+r.qs.length,0);
+  const est=estMin(S.per);
+  app.innerHTML=topBar()+`
+  <section class="hero">
+    <div>
+      <div class="eyebrow">모둠 대항 · 60분 진로 수업 · 문제 은행 ${bank}문항</div>
+      <h1>우리 모둠<br>IQ는 <em>몇</em>?</h1>
+      <p class="lead">두뇌 퀴즈로 몸을 풀고, 진로·교육과정·대입 문제로 진짜 실력을 겨룹니다. 모둠이 함께 풀어 답을 화이트보드에 쓰고, 마지막에 점수가 ‘모둠 IQ’로 바뀌어 발표됩니다.</p>
+      <ul class="rules">
+        <li>문제마다 제한시간 안에 모둠 답을 정해 보드에 적고 동시에 들어 올립니다.</li>
+        <li>난이도별 배점: <b class="lvtxt">★ 10점</b> · <b class="lvtxt">★★ 15점</b> · <b class="lvtxt">★★★ 20점</b>. 어려울수록 제한시간도 길어집니다.</li>
+        <li><b>×2 찬스</b>: 모둠마다 게임 전체에서 한 번, 자신 있는 문제의 점수를 두 배로! ★★★ 문제에 쓰면 40점.</li>
+        <li>같은 설정으로 다시 시작해도 문제가 새로 뽑혀서 다른 반에서도 쓸 수 있습니다.</li>
+      </ul>
+    </div>
+    <div class="panel setpanel">
+      <div>
+        <h3>난이도</h3>
+        <div class="seg" id="modes">${MODES.map(m=>`<button data-mode="${m.id}" class="${S.mode===m.id?"on":""}">${m.name}<small>${m.sub}</small></button>`).join("")}</div>
+      </div>
+      <div>
+        <h3>라운드당 문항 수</h3>
+        <div class="seg" id="pers">${COUNTS.map(c=>`<button data-per="${c}" class="${S.per===c?"on":""}">${c}문항<small>총 ${c*5}문항</small></button>`).join("")}</div>
+        <p class="est${est>60?" over":""}">예상 소요 약 ${est}분 ${est>60?"· 60분을 넘으니 라운드를 골라 진행하세요":est<45?"· 남는 시간은 나눔 활동에":"· 1시간 수업에 알맞아요"}</p>
+      </div>
+      <div>
+        <h3>모둠</h3>
+        <div class="stepper"><button id="minus" aria-label="모둠 수 줄이기">−</button><b id="cnt">${S.count}</b><button id="plus" aria-label="모둠 수 늘리기">+</button><span style="color:var(--muted)">모둠 (2~8)</span></div>
+        <div class="names">${teams().map((n,i)=>`<input id="nm${i}" value="${esc(n)}" maxlength="10" aria-label="${i+1}번 모둠 이름" style="border-left:6px solid ${TEAM_COLORS[i]}">`).join("")}</div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn hot" id="go">새 게임 시작</button>
+        ${S.set&&S.scores.length?'<button class="ghost" id="resume">진행 중인 게임 이어서</button>':""}
+      </div>
+    </div>
+  </section>
+  <section class="timeline">
+    <div class="eyebrow">수업 흐름 · 60분 (라운드당 6문항 기준)</div>
+    <div class="tl">
+      <div><b>0–5′</b><span>도입·모둠 이름 정하기</span></div>
+      <div><b>5–15′</b><span>R1 두뇌 워밍업</span></div>
+      <div><b>15–25′</b><span>R2 진로 IQ</span></div>
+      <div><b>25–35′</b><span>R3 교육과정 IQ</span></div>
+      <div><b>35–45′</b><span>R4 대입 IQ</span></div>
+      <div><b>45–52′</b><span>R5 스피드 넌센스</span></div>
+      <div><b>52–60′</b><span>IQ 발표·소감 나누기</span></div>
+    </div>
+  </section>`;
+  const sync=()=>teams().forEach((_,i)=>{const el=document.getElementById("nm"+i);if(el)S.names[i]=el.value.trim()||`${i+1}모둠`});
+  app.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{sync();S.mode=b.dataset.mode;render()});
+  app.querySelectorAll("[data-per]").forEach(b=>b.onclick=()=>{sync();S.per=+b.dataset.per;render()});
+  document.getElementById("minus").onclick=()=>{sync();S.count=Math.max(2,S.count-1);render()};
+  document.getElementById("plus").onclick=()=>{sync();S.count=Math.min(8,S.count+1);render()};
+  document.getElementById("go").onclick=()=>{sync();buildSet();S.scores=Array(S.count).fill(0);S.x2used=Array(S.count).fill(false);S.done=[];S.screen="hub";render()};
+  const r=document.getElementById("resume");if(r)r.onclick=()=>{sync();S.screen="hub";render()};
+}
+
+function vHub(){
+  const m=MODES.find(x=>x.id===S.mode)||MODES[1];
+  app.innerHTML=topBar('<button class="ghost" id="reset">설정으로 돌아가기</button>')+`
+  <div class="eyebrow" style="margin-bottom:10px">라운드 선택 · 난이도 ${m.name} · 라운드당 ${S.per}문항</div>
+  <div class="rounds">${ROUNDS.map((r,i)=>{const ids=S.set[i],pts=ids.reduce((t,k)=>t+ptsOf(r.qs[k]),0);
+    const cnt=[1,2,3].map(l=>ids.filter(k=>r.qs[k].d===l).length);
+    return `<button class="rcard${S.done.includes(i)?" done":""}" data-r="${i}">
+      <span class="no">ROUND ${i+1}</span><h3>${r.name}</h3><p>${r.sub}</p>
+      <div class="lvmix">${cnt.map((c,l)=>c?`<span>${"★".repeat(l+1)} ${c}</span>`:"").join("")}</div>
+      <div class="meta"><span class="tag">${ids.length}문항</span><span class="tag">최대 ${pts}점</span></div>
+    </button>`}).join("")}</div>
+  <div class="hubfoot"><span style="color:var(--muted)">만점 ${S.max}점 · 라운드는 순서대로 하지 않아도 됩니다.</span>
+  <button class="btn hot" id="fin">모둠 IQ 발표하기</button></div>`;
+  app.querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>{S.round=+b.dataset.r;S.qi=0;startQ();});
+  document.getElementById("fin").onclick=()=>{S.screen="final";render()};
+  document.getElementById("reset").onclick=()=>{S.screen="setup";render()};
+}
+
+function startQ(){S.screen="q";S.revealed=false;S.marks={};S.x2={};render()}
+
+function vQ(){
+  const R=ROUNDS[S.round],ids=S.set[S.round],Q=curQ(),T=teams(),L=LV[Q.d],tm=timeOf(R,Q);
+  const optHTML=Q.o?`<div class="opts">${Q.o.map((o,i)=>`<div class="opt${S.revealed?(i===Q.a?" right":" fade"):""}"><span class="k">${"ABCD"[i]}</span><span>${o}</span></div>`).join("")}</div>`:"";
+  const ans=S.revealed?`<div class="answerbox"><b>정답: ${Q.o?"ABCD"[Q.a]+". "+Q.o[Q.a]:Q.t}</b><p>${Q.e}</p></div>`
+    :(Q.o?"":`<div class="hidden-ans">모둠 보드에 답을 적어 주세요</div>`);
+  app.innerHTML=topBar('<button class="ghost" id="hub">라운드 목록</button>')+`
+  <div class="qhead"><div><div class="eyebrow">ROUND ${S.round+1} · ${S.qi+1} / ${ids.length}</div><div class="rn">${R.name}</div></div>
+    <div class="lvbadge lv${Q.d}"><span class="stars">${L.star}</span><span>${L.name} · ${L.pts}점</span></div>
+    <div class="dots">${ids.map((k,i)=>`<i class="${i===S.qi?"on":i<S.qi?"past":""}" title="${LV[R.qs[k].d].star}"></i>`).join("")}</div></div>
+  <div class="qcard">
+    <div class="qtext"><span style="font-family:var(--mono);color:var(--muted);font-size:.6em">Q${S.qi+1}.</span> ${Q.q}</div>
+    <div class="timer"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="none" stroke="var(--line)" stroke-width="8"/><circle id="arc" cx="50" cy="50" r="44" fill="none" stroke="var(--accent)" stroke-width="8" stroke-linecap="round" stroke-dasharray="276.5" stroke-dashoffset="0"/></svg>
+      <div class="num" id="tnum">${tm}</div><button class="ghost" id="tgo">타이머 시작</button></div>
+    ${optHTML}${ans}
+  </div>
+  ${S.revealed?`<div class="mark"><h3>맞힌 모둠을 눌러 주세요 <span class="hint">· 이 문제 ${L.pts}점 · ×2는 모둠별 1회</span></h3>
+    <div class="tchips">${T.map((n,i)=>`<div class="tchip${S.marks[i]?" ok":""}"><button data-m="${i}" style="color:${S.marks[i]?"var(--signal)":"inherit"}">${S.marks[i]?"✓ ":""}${esc(n)}</button><button class="x2${S.x2[i]?" on":""}" data-x="${i}" ${S.x2used[i]?"disabled":""} aria-label="${esc(n)} 2배 찬스">×2</button></div>`).join("")}</div></div>`:""}
+  <div class="qnav">
+    <button class="ghost" id="prev" ${S.qi===0?"disabled":""}>이전 문제</button>
+    ${S.revealed?`<button class="btn hot" id="next">점수 주고 ${S.qi<ids.length-1?"다음 문제":"라운드 결과"} →</button>`:`<button class="btn" id="show">정답 공개</button>`}
+  </div>`;
+  document.getElementById("hub").onclick=()=>{S.screen="hub";render()};
+  document.getElementById("prev").onclick=()=>{if(S.qi>0){S.qi--;startQ()}};
+  document.getElementById("tgo").onclick=e=>runTimer(tm,e.currentTarget);
+  if(!S.revealed){document.getElementById("show").onclick=()=>{S.revealed=true;render()};}
+  else{
+    app.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{const i=+b.dataset.m;S.marks[i]=!S.marks[i];if(!S.marks[i])delete S.x2[i];render()});
+    app.querySelectorAll("[data-x]").forEach(b=>b.onclick=()=>{const i=+b.dataset.x;S.x2[i]=!S.x2[i];if(S.x2[i])S.marks[i]=true;render()});
+    document.getElementById("next").onclick=award;
+  }
+}
+
+function runTimer(t,btn){
+  if(tick){stopTimer();btn.textContent="다시 시작";return}
+  left=t;btn.textContent="일시정지";
+  const arc=document.getElementById("arc"),num=document.getElementById("tnum");
+  const upd=()=>{num.textContent=left;arc.style.strokeDashoffset=276.5*(1-left/t)};
+  upd();beep(660,.12);
+  tick=setInterval(()=>{left--;upd();if(left<=5&&left>0)beep(880,.08);if(left<=0){stopTimer();beep(330,.6);btn.textContent="시간 종료!"}},1000);
+}
+
+function award(){
+  const Q=curQ(),ids=S.set[S.round];bumped=new Set();
+  Object.keys(S.marks).forEach(k=>{if(S.marks[k]){const i=+k;let p=ptsOf(Q);if(S.x2[i]&&!S.x2used[i]){p*=2;S.x2used[i]=true}S.scores[i]=(S.scores[i]||0)+p;bumped.add(i)}});
+  if(S.qi<ids.length-1){S.qi++;startQ()}
+  else{if(!S.done.includes(S.round))S.done.push(S.round);S.screen="sum";render()}
+}
+
+function ranked(){return teams().map((n,i)=>({n,i,s:S.scores[i]||0})).sort((a,b)=>b.s-a.s)}
+function iqOf(s){return Math.min(160,Math.round(85+(s/Math.max(1,S.max))*75))}
+function title(iq){return iq>=150?"인간 입시 백과사전":iq>=138?"진로 천재 연구소":iq>=125?"브레인 엘리트":iq>=110?"잠재력 폭발 중":"성장 가능성 무한대"}
+
+function vSum(){
+  const R=ROUNDS[S.round],rk=ranked(),max=Math.max(1,rk[0].s);
+  const next=ROUNDS.findIndex((_,i)=>!S.done.includes(i));
+  app.innerHTML=topBar()+`
+  <div class="eyebrow">ROUND ${S.round+1} 종료</div>
+  <div class="big">${R.name} 끝!</div>
+  <div class="board">${rk.map((t,k)=>`<div class="row${k===0?" first":""}"><div class="rk">${k+1}</div>
+    <div class="nm">${esc(t.n)}<div class="bar"><i style="width:${t.s/max*100}%;background:${TEAM_COLORS[t.i]}"></i></div></div>
+    <div class="iq">${t.s}<small>점</small></div></div>`).join("")}</div>
+  <div class="qnav"><button class="ghost" id="hub">라운드 목록</button>
+  ${next>=0?`<button class="btn hot" id="nx">ROUND ${next+1} ${ROUNDS[next].name} →</button>`:`<button class="btn hot" id="fin">모둠 IQ 발표하기 →</button>`}</div>`;
+  document.getElementById("hub").onclick=()=>{S.screen="hub";render()};
+  const nx=document.getElementById("nx");if(nx)nx.onclick=()=>{S.round=next;S.qi=0;startQ()};
+  const f=document.getElementById("fin");if(f)f.onclick=()=>{S.screen="final";render()};
+}
+
+function vFinal(){
+  const rk=ranked(),m=MODES.find(x=>x.id===S.mode)||MODES[1];
+  app.innerHTML=topBar('<button class="ghost" id="hub">라운드 목록</button>')+`
+  <div class="eyebrow">최종 결과 · 난이도 ${m.name} · 만점 ${S.max}점</div>
+  <div class="big">모둠 IQ 발표</div>
+  <div class="board" id="board">${rk.map((t,k)=>{const iq=iqOf(t.s);return `<div class="row${k===0?" first":""}"><div class="rk">${k+1}</div>
+    <div class="nm"><span style="color:${TEAM_COLORS[t.i]}">●</span> ${esc(t.n)}<small>${title(iq)} · ${t.s}점</small></div>
+    <div class="iq"><span class="count" data-to="${iq}">85</span><small>모둠 IQ</small></div></div>`}).join("")}</div>
+  <div class="panel reflect">
+    <h3>마무리 나눔 (모둠별 1분)</h3>
+    <ol>
+      <li>오늘 처음 알게 된 <b>교육과정·대입 정보</b> 한 가지는?</li>
+      <li>틀렸지만 꼭 기억해야 할 문제는 무엇이었나?</li>
+      <li>내 진로를 위해 다음 학기 수강신청 때 확인할 것 한 가지</li>
+    </ol>
+    <p class="fine">※ ‘모둠 IQ’는 점수를 85~160 범위로 바꾼 재미용 지표이며 실제 지능검사 결과가 아닙니다.</p>
+  </div>`;
+  document.getElementById("hub").onclick=()=>{S.screen="hub";render()};
+  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  app.querySelectorAll(".count").forEach(el=>{const to=+el.dataset.to;if(reduce){el.textContent=to;return}
+    let v=85;const id=setInterval(()=>{v+=Math.max(1,Math.ceil((to-v)/8));if(v>=to){v=to;clearInterval(id)}el.textContent=v},45)});
+  beep(523,.15);setTimeout(()=>beep(659,.15),160);setTimeout(()=>beep(784,.3),320);
+}
+
+document.addEventListener("keydown",e=>{
+  if(S.screen!=="q"||e.target.tagName==="INPUT")return;
+  if(e.key===" "){e.preventDefault();const b=document.getElementById(S.revealed?"next":"show");b&&b.click()}
+  if(e.key==="t"||e.key==="T"){const b=document.getElementById("tgo");b&&b.click()}
+});
+render();
+})();
+</script>
+
+</body></html>
